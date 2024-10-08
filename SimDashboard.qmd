@@ -1,0 +1,37 @@
+---
+title: "Sim Metrics Dashboard"
+author: "Mike"
+execute: 
+  echo: false
+format: 
+    dashboard:
+        logo: images/hopkinslogoHighRes.jpg
+        orientation: columns
+        # nav-buttons: 
+            # - reddit
+            # - icon: sim_center
+            # href: https://www.hopkinsmedicine.org/simulation-center
+---
+## Column {width=50%}
+```{r}
+#| label: fig-pupilDiam
+#| fig-cap: "Pupil diameter."
+#| warning: false
+
+
+library(ggplot2)
+library(tidyverse)
+library(here)
+config <- config::get()
+source(here('1_funcs.R'), echo = FALSE)
+tobii_f <- 'IVlineInsertationDemo Metrics.tsv'
+tobii_df <- getTobii(here::here(config$data_dir,tobii_f))
+tobii_df$breaks <- cut(1:nrow(tobii_df), breaks = ceiling(nrow(tobii_df)/5), labels = FALSE)
+
+tobii_df |>
+  group_by(breaks) |>
+  summarize(pupil_dm = mean(average_whole_fixation_pupil_diameter, na.rm = TRUE)) |>
+  ggplot2::ggplot(aes(x = breaks, y = pupil_dm)) + geom_line() + ggthemes::theme_tufte() + labs(title = "Pupil diameter")
+
+```
+## Column {width=50%}
